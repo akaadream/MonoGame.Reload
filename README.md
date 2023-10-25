@@ -33,7 +33,7 @@ Then, **instanciate** it inside your `Initialize` function:
 ```csharp
 protected override void Initialize()
 {
-+    _watcher = new(Content);
+    _watcher = new(Content);
 
     base.Initialize();
 }
