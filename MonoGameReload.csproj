@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>MonoGame.Reload</PackageId>
+    <Title>MonoGame.Reload</Title>
+    <Company>Almost Good Studio</Company>
+    <Product>MonoGame.Reload</Product>
+    <PackageIcon>Icon.png</PackageIcon>
+    <Description>Hot-reloading for MonoGame</Description>
+    <Authors>Guillaume Lortet</Authors>
+    <Version>0.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.1.303" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="C:\Users\lorte\.nuget\packages\monogame.framework.content.pipeline\3.8.1.303\contentFiles\any\net6.0\libmojoshader_64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\lorte\.nuget\packages\monogame.framework.content.pipeline\3.8.1.303\contentFiles\any\net6.0\mgfxc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\lorte\.nuget\packages\monogame.framework.content.pipeline\3.8.1.303\contentFiles\any\net6.0\mgfxc.deps.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\lorte\.nuget\packages\monogame.framework.content.pipeline\3.8.1.303\contentFiles\any\net6.0\mgfxc.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\lorte\.nuget\packages\monogame.framework.content.pipeline\3.8.1.303\contentFiles\any\net6.0\mgfxc.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="C:\Users\lorte\.nuget\packages\monogame.framework.content.pipeline\3.8.1.303\contentFiles\any\net6.0\mgfxc.runtimeconfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
