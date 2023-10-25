@@ -14,6 +14,9 @@
     <Description>Hot-reloading for MonoGame</Description>
     <Authors>Guillaume Lortet</Authors>
     <Version>0.0.1</Version>
+    <RepositoryUrl>https://github.com/akaadream/MonoGame.Reload</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -48,6 +51,10 @@
 
   <ItemGroup>
     <None Update="Icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
