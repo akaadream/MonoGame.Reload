@@ -46,11 +46,11 @@ protected override void Initialize()
 {
     _watcher = new(Content);
 
-+   AssetReloader.Initialize(
-+       _watcher.ParentPath,
-+       PlatformHelper.GetTargetPlatform(ProjectPlatform.DesktopGL),
-+       GraphicsDevice
-+       );
+    AssetReloader.Initialize(
+        _watcher.ProjectRootPath,
+        PlatformHelper.GetTargetPlatform(ProjectPlatform.DesktopGL),
+        GraphicsDevice
+        );
 }
 ```
 
@@ -61,7 +61,7 @@ protected override void LoadContent()
 {
     _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-+   _watcher.LoadFiles();
+    _watcher.LoadFiles();
 }
 ```
 
