@@ -29,7 +29,7 @@ namespace MonoGameReload.Platform
     /// <summary>
     /// Retrieved from MonoGame.Framework.Content.Pipeline.TargetPlatform.cs
     /// </summary>
-    public enum ProjectPlateform
+    public enum ProjectPlatform
     {
         /// <summary>
         /// All desktop versions of Windows using DirectX.
@@ -124,7 +124,7 @@ namespace MonoGameReload.Platform
 
     public static class PlatformHelper
     {
-        public static TargetPlatform GetTargetPlatform(ProjectPlateform projectPlateform)
+        public static TargetPlatform GetTargetPlatform(ProjectPlatform projectPlateform)
         {
             return (TargetPlatform)projectPlateform;
         }

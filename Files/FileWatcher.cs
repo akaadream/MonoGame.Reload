@@ -35,14 +35,19 @@ namespace MonoGameReload.Files
     public class FileWatcher
     {
         /// <summary>
-        /// Graphics device to load data
+        /// The content manager used to initialize the assets library
         /// </summary>
-        public GraphicsDevice GraphicsDevice { get; private set; }
+        public ContentManager ContentManager { get; private set; }
 
         /// <summary>
         /// The root path where to look for files updates. If you want to not use the recursive mode, put the root on the specific folder you want to watch
         /// </summary>
         public string RootPath { get; set; }
+
+        /// <summary>
+        /// The project root path
+        /// </summary>
+        public string ProjectRootPath { get; set; }
 
         /// <summary>
         /// If the file watcher have to look updates of 
@@ -59,9 +64,11 @@ namespace MonoGameReload.Files
         /// </summary>
         public FilesTree FilesTree { get; set; }
 
-        public FileWatcher(GraphicsDevice graphicsDevice, string root = "Content", bool recursive = true)
+        public FileWatcher(ContentManager contentManager, string root = "Content", bool recursive = true)
         {
-            GraphicsDevice = graphicsDevice;
+            ContentManager = contentManager;
+            RootPath = root;
+            ProjectRootPath = "";
 
             DirectoryInfo? directoryInfo = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory);
             if (directoryInfo != null && 
@@ -69,27 +76,24 @@ namespace MonoGameReload.Files
                 directoryInfo.Parent.Parent != null && 
                 directoryInfo.Parent.Parent.Parent != null)
             {
-                RootPath = Path.Combine(directoryInfo.Parent.Parent.Parent.FullName, root);
-            }
-            else
-            {
-                RootPath = root;
+                ProjectRootPath = directoryInfo.Parent.Parent.Parent.FullName;
+                RootPath = Path.Combine(ProjectRootPath, root);
             }
             
             Recursive = recursive;
 
             FilesTree = new();
 
+            // Initialize assets collections
+            Initialize();
+
             // Configure the file system watcher
             ConfigureHotReloading();
-
-            // Load files
-            LoadFiles();
         }
 
-        public void Initialize(ContentManager contentManager)
+        public void Initialize()
         {
-            AssetsManager.GetInstance().Initialize(contentManager);
+            AssetsManager.GetInstance().Initialize(ContentManager);
         }
 
         /// <summary>
