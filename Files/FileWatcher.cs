@@ -93,7 +93,7 @@ namespace MonoGameReload.Files
 
         public void Initialize()
         {
-            AssetsManager.GetInstance().Initialize(ContentManager);
+            AssetsManager.Initialize(ContentManager);
         }
 
         /// <summary>
@@ -127,10 +127,10 @@ namespace MonoGameReload.Files
             }
 
             // Constructed files properties
-            AssetsManager.GetInstance().Cleanup();
+            AssetsManager.Cleanup();
             foreach (FileProperties file in FilesTree.Files)
             {
-                AssetsManager.GetInstance().Load(file);
+                AssetsManager.Load(file);
             }
         }
 
@@ -197,57 +197,57 @@ namespace MonoGameReload.Files
 
             switch (file.AssetType)
             {
-                case AssetType.Texture2D:
+                case AssetType.Texture:
                     Texture2D? newTexture2D = AssetReloader.ReloadTexture2D(file.AbsolutePath);
-                    if (newTexture2D == null)
+                    if (newTexture2D == null || AssetsManager.Textures == null)
                     {
                         return;
                     }
-                    AssetsManager.GetInstance().Textures2D[file.FullName] = newTexture2D;
+                    AssetsManager.Textures[file.FullName] = newTexture2D;
                     break;
                 case AssetType.Effect:
                     Effect? newEffect = AssetReloader.ReloadEffect(file.AbsolutePath);
-                    if (newEffect == null)
+                    if (newEffect == null || AssetsManager.Effects == null)
                     {
                         return;
                     }
-                    AssetsManager.GetInstance().Effects[file.FullName] = newEffect;
+                    AssetsManager.Effects[file.FullName] = newEffect;
                     break;
                 case AssetType.SoundEffect:
                     SoundEffect? newSoundEffect = AssetReloader.ReloadSoundEffect(file.AbsolutePath);
-                    if (newSoundEffect == null)
+                    if (newSoundEffect == null || AssetsManager.SoundEffects == null)
                     {
                         return;
                     }
                     // Clean the current sound effect
-                    AssetsManager.GetInstance().SoundEffects[file.FullName].Dispose();
-                    AssetsManager.GetInstance().SoundEffects[file.FullName] = newSoundEffect;
+                    AssetsManager.SoundEffects[file.FullName].Dispose();
+                    AssetsManager.SoundEffects[file.FullName] = newSoundEffect;
                     break;
                 case AssetType.Song:
                     Song? newSong = AssetReloader.ReloadSong(file.AbsolutePath);
-                    if (newSong == null)
+                    if (newSong == null || AssetsManager.Songs == null)
                     {
                         return;
                     }
                     // If a song is already playing, stop it
                     MediaPlayer.Stop();
-                    AssetsManager.GetInstance().Songs[file.FullName] = newSong;
+                    AssetsManager.Songs[file.FullName] = newSong;
                     break;
                 case AssetType.SpriteFont:
                     SpriteFont? newSpriteFont = AssetReloader.ReloadSpriteFont(file.AbsolutePath);
-                    if (newSpriteFont == null)
+                    if (newSpriteFont == null || AssetsManager.SpriteFonts == null)
                     {
                         return;
                     }
-                    AssetsManager.GetInstance().SpriteFonts[file.FullName] = newSpriteFont;
+                    AssetsManager.SpriteFonts[file.FullName] = newSpriteFont;
                     break;
                 case AssetType.Model:
                     Model? newModel = AssetReloader.ReloadModel(file.AbsolutePath);
-                    if (newModel == null)
+                    if (newModel == null || AssetsManager.Models == null)
                     {
                         return;
                     }
-                    AssetsManager.GetInstance().Models[file.FullName] = newModel;
+                    AssetsManager.Models[file.FullName] = newModel;
                     break;
             }
         }

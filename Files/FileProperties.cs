@@ -81,10 +81,8 @@ namespace MonoGameReload.Files
             // Texture 2D
             if (FileWatcherExtensions.IsTexture(extension))
             {
-                return AssetType.Texture2D;
+                return AssetType.Texture;
             }
-
-            // Texture 3D
 
             // Sound effect
             if (FileWatcherExtensions.SoundEffectExtension == extension)

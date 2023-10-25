@@ -27,7 +27,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using MonoGameReload.Files;
-using System.Collections.Generic;
 
 namespace MonoGameReload.Assets
 {
@@ -37,8 +36,7 @@ namespace MonoGameReload.Assets
     public enum AssetType
     {
         NoProcessing,
-        Texture2D,
-        Texture3D,
+        Texture,
         Song,
         SoundEffect,
         Effect,
@@ -49,62 +47,57 @@ namespace MonoGameReload.Assets
         LocalizedFont,
     }
 
-    public class AssetsManager
+    public static class AssetsManager
     {
-        /// <summary>
-        /// Single Instance
-        /// </summary>
-        private static AssetsManager? _instance;
-
         /// <summary>
         /// Content manager
         /// </summary>
-        public ContentManager? ContentManager { get; private set; }
+        public static ContentManager? ContentManager { get; private set; }
 
         /// <summary>
         /// Textures 2D collection
         /// </summary>
-        public Dictionary<string, Texture2D> Textures2D { get; private set; }
-
-        /// <summary>
-        /// Textures 3D collection
-        /// </summary>
-        public Dictionary<string, Texture3D> Textures3D { get; private set; }
+        public static Dictionary<string, Texture2D>? Textures { get; private set; }
 
         /// <summary>
         /// Songs collection
         /// </summary>
-        public Dictionary<string, Song> Songs { get; private set; }
+        public static Dictionary<string, Song>? Songs { get; private set; }
 
         /// <summary>
         /// Sound effects collection (.wav)
         /// </summary>
-        public Dictionary<string, SoundEffect> SoundEffects { get; private set; }
+        public static Dictionary<string, SoundEffect>? SoundEffects { get; private set; }
 
         /// <summary>
         /// Models collection
         /// </summary>
-        public Dictionary<string, Model> Models { get; private set; }
+        public static Dictionary<string, Model>? Models { get; private set; }
 
         /// <summary>
         /// Sprite fonts collection (.spritefont)
         /// </summary>
-        public Dictionary<string, SpriteFont> SpriteFonts { get; private set; }
+        public static Dictionary<string, SpriteFont>? SpriteFonts { get; private set; }
 
         /// <summary>
         /// Materials collection
         /// </summary>
-        public Dictionary<string, EffectMaterial> EffectMaterials { get; private set; }
+        public static Dictionary<string, EffectMaterial>? EffectMaterials { get; private set; }
 
         /// <summary>
         /// Effects collection (.fx)
         /// </summary>
-        public Dictionary<string, Effect> Effects { get; private set; }
+        public static Dictionary<string, Effect>? Effects { get; private set; }
 
-        private AssetsManager()
+        /// <summary>
+        /// Initialize the asset manager
+        /// </summary>
+        /// <param name="contentManager"></param>
+        public static void Initialize(ContentManager contentManager)
         {
-            Textures2D = new();
-            Textures3D = new();
+            ContentManager = contentManager;
+
+            Textures = new();
             Songs = new();
             SoundEffects = new();
             Models = new();
@@ -114,34 +107,24 @@ namespace MonoGameReload.Assets
         }
 
         /// <summary>
-        /// Initialize the asset manager
-        /// </summary>
-        /// <param name="contentManager"></param>
-        public void Initialize(ContentManager contentManager)
-        {
-            ContentManager = contentManager;
-        }
-
-        /// <summary>
         /// Clean up all the assets collections
         /// </summary>
-        public void Cleanup()
+        public static void Cleanup()
         {
-            Textures2D.Clear();
-            Textures3D.Clear();
-            Songs.Clear();
-            SoundEffects.Clear();
-            Models.Clear();
-            SpriteFonts.Clear();
-            EffectMaterials.Clear();
-            Effects.Clear();
+            Textures?.Clear();
+            Songs?.Clear();
+            SoundEffects?.Clear();
+            Models?.Clear();
+            SpriteFonts?.Clear();
+            EffectMaterials?.Clear();
+            Effects?.Clear();
         }
 
         /// <summary>
         /// Loading an asset
         /// </summary>
         /// <param name="fileName"></param>
-        public void Load(AssetType type, string fileName)
+        public static void Load(AssetType type, string fileName)
         {
             if (ContentManager == null)
             {
@@ -150,20 +133,47 @@ namespace MonoGameReload.Assets
 
             switch (type)
             {
-                case AssetType.Texture2D:
-                    LoadTo(Textures2D, fileName);
-                    break;
-                case AssetType.Texture3D:
-                    LoadTo(Textures3D, fileName);
+                case AssetType.Texture:
+                    if (Textures == null)
+                    {
+                        return;
+                    }
+                    LoadTo(Textures, fileName);
                     break;
                 case AssetType.SoundEffect:
+                    if (SoundEffects == null)
+                    {
+                        return;
+                    }
                     LoadTo(SoundEffects, fileName);
                     break;
                 case AssetType.Song:
+                    if (Songs == null)
+                    {
+                        return;
+                    }
                     LoadTo(Songs, fileName);
                     break;
                 case AssetType.Effect:
+                    if (Effects == null)
+                    {
+                        return;
+                    }
                     LoadTo(Effects, fileName);
+                    break;
+                case AssetType.Model:
+                    if (Models == null)
+                    {
+                        return;
+                    }
+                    LoadTo(Models, fileName);
+                    break;
+                case AssetType.SpriteFont:
+                    if (SpriteFonts == null)
+                    {
+                        return;
+                    }
+                    LoadTo(SpriteFonts, fileName);
                     break;
             }
         }
@@ -172,7 +182,7 @@ namespace MonoGameReload.Assets
         /// Load an asset using its file properties
         /// </summary>
         /// <param name="file"></param>
-        public void Load(FileProperties file)
+        public static void Load(FileProperties file)
         {
             Load(file.AssetType, file.FullName);
         }
@@ -184,7 +194,7 @@ namespace MonoGameReload.Assets
         /// <param name="dictionary"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        private bool LoadTo<T>(Dictionary<string, T> dictionary, string fileName)
+        private static bool LoadTo<T>(Dictionary<string, T> dictionary, string fileName)
         {
             if (dictionary == null)
             {
@@ -217,54 +227,39 @@ namespace MonoGameReload.Assets
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public AssetType GetAssetTypeOf(string fileName)
+        public static AssetType GetAssetTypeOf(string fileName)
         {
-            if (Textures2D.ContainsKey(fileName))
+            if (Textures != null && Textures.ContainsKey(fileName))
             {
-                return AssetType.Texture2D;
+                return AssetType.Texture;
             }
 
-            if (Textures3D.ContainsKey(fileName))
-            {
-                return AssetType.Texture3D;
-            }
-
-            if (SoundEffects.ContainsKey(fileName))
+            if (SoundEffects != null && SoundEffects.ContainsKey(fileName))
             {
                 return AssetType.SoundEffect;
             }
 
-            if (Songs.ContainsKey(fileName))
+            if (Songs != null && Songs.ContainsKey(fileName))
             {
                 return AssetType.Song;
             }
 
-            if (EffectMaterials.ContainsKey(fileName))
+            if (EffectMaterials != null && EffectMaterials.ContainsKey(fileName))
             {
                 return AssetType.Material;
             }
 
-            if (Effects.ContainsKey(fileName))
+            if (Effects != null && Effects.ContainsKey(fileName))
             {
                 return AssetType.Effect;
             }
 
-            if (Models.ContainsKey(fileName))
+            if (Models != null && Models.ContainsKey(fileName))
             {
                 return AssetType.Model;
             }
 
             return AssetType.NoProcessing;
-        }
-
-        /// <summary>
-        /// Singleton instanciation
-        /// </summary>
-        /// <returns></returns>
-        public static AssetsManager GetInstance()
-        {
-            _instance ??= new();
-            return _instance;
         }
     }
 }

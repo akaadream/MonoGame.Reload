@@ -6,21 +6,21 @@ Set up the hot-reloader in a flash and simply enjoy the magic.
 
 ## Installation
 
-MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.0.3).  
+MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.1.0).  
 
 #### .NET CLI
 ```
-dotnet add package MonoGame.Reload --version 0.0.3
+dotnet add package MonoGame.Reload --version 0.1.0
 ```
 
 #### Package Manager
 ```
-NuGet\Install-Package MonoGame.Reload -Version 0.0.3
+NuGet\Install-Package MonoGame.Reload -Version 0.1.0
 ```
 
 #### PackageReference
 ```
-<PackageReference Include="MonoGame.Reload" Version="0.0.3" />
+<PackageReference Include="MonoGame.Reload" Version="0.1.0" />
 ```
 
 ## Getting started
@@ -48,7 +48,7 @@ protected override void Initialize()
 
     AssetReloader.Initialize(
         _watcher.ProjectRootPath,
-        PlatformHelper.GetTargetPlatform(ProjectPlatform.DesktopGL),
+        Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform.DesktopGL,
         GraphicsDevice
         );
 }
@@ -70,7 +70,7 @@ The Hot-Reloader is now setup and you can easily access to an asset which will b
 
 ```csharp
 // Access to a Texture2D
-AssetsManager.GetInstance().Textures2D["Sprites/name_of_my_texture"];
+AssetsManager.Textures["Sprites/name_of_my_texture"];
 ```
 
 > *Note*: You have to respect the hierarchy of your files.  
