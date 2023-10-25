@@ -61,7 +61,8 @@ namespace MonoGameReload.Files
             FullName = FullName.Replace(@"\", "/");
             FullName = FullName.Replace(@"\\", "/");
             FullName = FullName.Substring(1, FullName.Length - 1);
-            FullName = FullName.Split('.')[0];
+            int lastDotIndex = FullName.LastIndexOf('.');
+            FullName = FullName.Substring(0, lastDotIndex);
 
             Extension = Path.GetExtension(filePath);
 

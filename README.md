@@ -6,21 +6,21 @@ Set up the hot-reloader in a flash and simply enjoy the magic.
 
 ## Installation
 
-MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.0.2).  
+MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.0.3).  
 
 #### .NET CLI
 ```
-dotnet add package MonoGame.Reload --version 0.0.2
+dotnet add package MonoGame.Reload --version 0.0.3
 ```
 
 #### Package Manager
 ```
-NuGet\Install-Package MonoGame.Reload -Version 0.0.2
+NuGet\Install-Package MonoGame.Reload -Version 0.0.3
 ```
 
 #### PackageReference
 ```
-<PackageReference Include="MonoGame.Reload" Version="0.0.2" />
+<PackageReference Include="MonoGame.Reload" Version="0.0.3" />
 ```
 
 ## Getting started
