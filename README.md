@@ -79,6 +79,14 @@ AssetsManager.GetInstance().Textures2D["Sprites/name_of_my_texture"];
 
 > *2nd Note*: If the key of the texture does not exists, an exception will be thrown, so you may want to check if the texture name exists by using `Textures2D.ContainsKey(string key)`.
 
+## Roadmap
+
+This library is currently limited to the default assets the Content Pipeline is managing. (and even some types of files are missing)  
+It's why I want to improve MonoGame.Reload to make it have more files reloaded!
+- [ ] Json files reload
+- [ ] XML files reload
+- [ ] Aseprite file reload (using [MonoGame.Aseprite](https://monogameaseprite.net/))
+
 ## Licence
 
 MIT License
