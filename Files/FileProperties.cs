@@ -58,19 +58,43 @@ namespace MonoGameReload.Files
         /// </summary>
         public event EventHandler<FileSystemEventArgs>? Updated;
 
-        public FileProperties(string filePath, string root = "")
+        private FileProperties()
         {
-            AbsolutePath = filePath;
-            FullName = filePath.Replace(root, "");
+            Name = "";
+            FullName = "";
+            AbsolutePath = "";
+            Extension = "";
+            AssetType = AssetType.NoProcessing;
+        }
+
+        public FileProperties(string filePath, string root = ""): this()
+        {
+            Rename(filePath, root);
+        }
+
+        /// <summary>
+        /// Rename the file
+        /// </summary>
+        /// <param name="newFilePath"></param>
+        public void Rename(string newFilePath, string root = "")
+        {
+            AbsolutePath = newFilePath;
+            if (root != string.Empty)
+            {
+                FullName = newFilePath.Replace(root, "");
+            }
             FullName = FullName.Replace(@"\", "/");
             FullName = FullName.Replace(@"\\", "/");
             FullName = FullName.Substring(1, FullName.Length - 1);
-            int lastDotIndex = FullName.LastIndexOf('.');
-            FullName = FullName.Substring(0, lastDotIndex);
+            if (FullName.Contains("."))
+            {
+                int lastDotIndex = FullName.LastIndexOf('.');
+                FullName = FullName.Substring(0, lastDotIndex);
+            }
 
-            Extension = Path.GetExtension(filePath);
+            Extension = Path.GetExtension(newFilePath);
 
-            Name = Path.GetFileNameWithoutExtension(filePath);
+            Name = Path.GetFileNameWithoutExtension(newFilePath);
 
             AssetType = FindType(Extension);
         }
@@ -130,6 +154,13 @@ namespace MonoGameReload.Files
             }
 
             return AssetType.NoProcessing;
+        }
+
+        public static string GetFilename(string filePath)
+        {
+            string fileName = filePath.Replace(@"\", "/");
+            fileName = fileName.Split('.')[0];
+            return fileName;
         }
     }
 }

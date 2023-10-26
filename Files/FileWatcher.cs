@@ -28,6 +28,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Aseprite;
 using MonoGameReload.Assets;
+using SharpFont.PostScript;
 
 namespace MonoGameReload.Files
 {
@@ -59,6 +60,11 @@ namespace MonoGameReload.Files
         public FileSystemWatcher? Watcher { get; set; }
 
         /// <summary>
+        /// Types the watcher have to ignore
+        /// </summary>
+        public AssetType IgnoreType { get; set; }
+
+        /// <summary>
         /// Files tree of the watcher
         /// </summary>
         public FilesTree FilesTree { get; set; }
@@ -80,6 +86,9 @@ namespace MonoGameReload.Files
             }
             
             Recursive = recursive;
+
+            // Initialize ignore type
+            IgnoreType = AssetType.NoProcessing;
 
             FilesTree = new();
 
@@ -121,8 +130,14 @@ namespace MonoGameReload.Files
                     continue;
                 }
 
+                FileProperties file = new(files[i], RootPath);
+                if (file.AssetType == IgnoreType)
+                {
+                    continue;
+                }
+
                 // Add the file to the files tree
-                FilesTree.Files.Add(new(files[i], RootPath));
+                FilesTree.Files.Add(file);
             }
 
             // Constructed files properties
@@ -144,36 +159,217 @@ namespace MonoGameReload.Files
 
                 // If true, the watcher will look updates on sub folders of the root directory
                 IncludeSubdirectories = Recursive,
-                NotifyFilter = NotifyFilters.LastWrite,
+                NotifyFilter = NotifyFilters.Attributes
+                                 | NotifyFilters.CreationTime
+                                 | NotifyFilters.DirectoryName
+                                 | NotifyFilters.FileName
+                                 | NotifyFilters.LastWrite
+                                 | NotifyFilters.Security
+                                 | NotifyFilters.Size,
             };
 
             // Watcher events
             Watcher.Changed += UpdateContentFile;
+            Watcher.Created += CreateContentFile;
+            Watcher.Deleted += DeleteContentFile;
+            Watcher.Renamed += RenameContentFile;
             Watcher.Error += OnError;
         }
 
         /// <summary>
-        /// Called when a file from the root directory is updated
+        /// Called when a file from the content directory is created
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        public void UpdateContentFile(object sender, FileSystemEventArgs args)
+        private void CreateContentFile(object sender, FileSystemEventArgs args)
+        {
+            if (args.FullPath == null || args.Name == null)
+            {
+                return;
+            }
+
+            FileProperties file = new(args.FullPath, RootPath);
+
+            if (IgnoreType == file.AssetType)
+            {
+                return;
+            }
+
+            UpdateOrCreateFile(file, true);
+
+            FilesTree.Files.Add(file);
+        }
+
+        /// <summary>
+        /// Called when a file from the content directory is deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void DeleteContentFile(object sender, FileSystemEventArgs args)
         {
             if (args.Name == null)
             {
                 return;
             }
 
-            string fileName = args.Name.ToString().Replace(@"\", "/");
-            fileName = fileName.Split('.')[0];
-
-            FileProperties? file = FilesTree.Find(fileName);
-            if (file == null)
+            FileProperties? file = FilesTree.Find(FileProperties.GetFilename(args.Name.ToString()));
+            if (file == null || IgnoreType == file.AssetType)
             {
                 return;
             }
 
-            UpdateFile(file);
+            bool? removed = false;
+
+            // Remove the loaded asset
+            switch (file.AssetType)
+            {
+                case AssetType.Texture:
+                    removed = AssetsManager.Textures?.Remove(file.FullName);
+                    break;
+                case AssetType.SpriteFont:
+                    removed = AssetsManager.SpriteFonts?.Remove(file.FullName);
+                    break;
+                case AssetType.Model:
+                    removed = AssetsManager.Models?.Remove(file.FullName);
+                    break;
+                case AssetType.Song:
+                    removed = AssetsManager.Songs?.Remove(file.FullName);
+                    break;
+                case AssetType.SoundEffect:
+                    removed = AssetsManager.SoundEffects?.Remove(file.FullName);
+                    break;
+                case AssetType.Effect:
+                    removed = AssetsManager.Effects?.Remove(file.FullName);
+                    break;
+                case AssetType.Aseprite:
+                    removed = AssetsManager.AsepriteFiles?.Remove(file.FullName);
+                    break;
+                case AssetType.Data:
+                    removed = AssetsManager.DataFiles?.Remove(file.FullName);
+                    break;
+            }
+
+            // The file has been deleted
+            if (removed != null && removed == true)
+            {
+                // Remove the file from the files tree
+                FilesTree.Files.Remove(file);
+            }
+        }
+
+        /// <summary>
+        /// Called when a file from the content directory is renamed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void RenameContentFile(object sender, RenamedEventArgs args)
+        {
+            if (args.Name == null || args.OldName == null)
+            {
+                return;
+            }
+
+            string oldFileName = FileProperties.GetFilename(args.OldName);
+            string newFileName = FileProperties.GetFilename(args.Name);
+            string newFilePath = args.FullPath;
+
+            FileProperties? file = FilesTree.Find(oldFileName);
+            if (file == null || IgnoreType == file.AssetType)
+            {
+                return;
+            }
+
+            // Update collections by adding the new file name and remove the old one
+            switch (file.AssetType)
+            {
+                case AssetType.Texture:
+                    if (AssetsManager.Textures == null || AssetsManager.Textures.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.Textures.Add(newFileName, AssetsManager.Textures[file.FullName]);
+                    AssetsManager.Textures.Remove(oldFileName);
+                    break;
+                case AssetType.SpriteFont:
+                    if (AssetsManager.SpriteFonts == null || AssetsManager.SpriteFonts.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.SpriteFonts.Add(newFileName, AssetsManager.SpriteFonts[file.FullName]);
+                    AssetsManager.SpriteFonts.Remove(oldFileName);
+                    break;
+                case AssetType.Model:
+                    if (AssetsManager.Models == null || AssetsManager.Models.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.Models.Add(newFileName, AssetsManager.Models[file.FullName]);
+                    AssetsManager.Models.Remove(oldFileName);
+                    break;
+                case AssetType.Song:
+                    if (AssetsManager.Songs == null || AssetsManager.Songs.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.Songs.Add(newFileName, AssetsManager.Songs[file.FullName]);
+                    AssetsManager.Songs.Remove(oldFileName);
+                    break;
+                case AssetType.SoundEffect:
+                    if (AssetsManager.SoundEffects == null || AssetsManager.SoundEffects.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.SoundEffects.Add(newFileName, AssetsManager.SoundEffects[file.FullName]);
+                    AssetsManager.SoundEffects.Remove(oldFileName);
+                    break;
+                case AssetType.Effect:
+                    if (AssetsManager.Effects == null || AssetsManager.Effects.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.Effects.Add(newFileName, AssetsManager.Effects[file.FullName]);
+                    AssetsManager.Effects.Remove(oldFileName);
+                    break;
+                case AssetType.Aseprite:
+                    if (AssetsManager.AsepriteFiles == null || AssetsManager.AsepriteFiles.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.AsepriteFiles.Add(newFileName, AssetsManager.AsepriteFiles[file.FullName]);
+                    AssetsManager.AsepriteFiles.Remove(oldFileName);
+                    break;
+                case AssetType.Data:
+                    if (AssetsManager.DataFiles == null || AssetsManager.DataFiles.ContainsKey(newFileName))
+                    {
+                        return;
+                    }
+                    AssetsManager.DataFiles.Add(newFileName, AssetsManager.DataFiles[file.FullName]);
+                    AssetsManager.DataFiles.Remove(oldFileName);
+                    break;
+            }
+
+            file.Rename(newFilePath, RootPath);
+        }
+
+        /// <summary>
+        /// Called when a file from the content directory is updated
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void UpdateContentFile(object sender, FileSystemEventArgs args)
+        {
+            if (args.Name == null)
+            {
+                return;
+            }
+
+            FileProperties? file = FilesTree.Find(FileProperties.GetFilename(args.Name.ToString()));
+            if (file == null || IgnoreType == file.AssetType)
+            {
+                return;
+            }
+
+            UpdateOrCreateFile(file);
 
             // Call the updated event of the file
             file.OnUpdated(sender, args);
@@ -183,7 +379,7 @@ namespace MonoGameReload.Files
         /// Update the given file inside the asset manager
         /// </summary>
         /// <param name="file"></param>
-        private void UpdateFile(FileProperties file)
+        private static void UpdateOrCreateFile(FileProperties file, bool create = false)
         {
             // We didn't found the file
             if (file == null)
@@ -205,7 +401,15 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    AssetsManager.Textures[file.FullName] = newTexture2D;
+
+                    if (create)
+                    {
+                        AssetsManager.Textures.Add(file.FullName, newTexture2D);
+                    }
+                    else
+                    {
+                        AssetsManager.Textures[file.FullName] = newTexture2D;
+                    }
                     break;
                 case AssetType.Effect:
                     Effect? newEffect = AssetReloader.LoadEffect(file.AbsolutePath);
@@ -213,7 +417,15 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    AssetsManager.Effects[file.FullName] = newEffect;
+
+                    if (create)
+                    {
+                        AssetsManager.Effects.Add(file.FullName, newEffect);
+                    }
+                    else
+                    {
+                        AssetsManager.Effects[file.FullName] = newEffect;
+                    }
                     break;
                 case AssetType.SoundEffect:
                     SoundEffect? newSoundEffect = AssetReloader.LoadSoundEffect(file.AbsolutePath);
@@ -221,9 +433,17 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    // Clean the current sound effect
-                    AssetsManager.SoundEffects[file.FullName].Dispose();
-                    AssetsManager.SoundEffects[file.FullName] = newSoundEffect;
+
+                    if (create)
+                    {
+                        AssetsManager.SoundEffects.Add(file.FullName, newSoundEffect);
+                    }
+                    else
+                    {
+                        // Clean the current sound effect
+                        AssetsManager.SoundEffects[file.FullName].Dispose();
+                        AssetsManager.SoundEffects[file.FullName] = newSoundEffect;
+                    }
                     break;
                 case AssetType.Song:
                     Song? newSong = AssetReloader.LoadSong(file.AbsolutePath);
@@ -231,9 +451,18 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    // If a song is already playing, stop it
-                    MediaPlayer.Stop();
-                    AssetsManager.Songs[file.FullName] = newSong;
+                    
+                    if (create)
+                    {
+                        AssetsManager.Songs.Add(file.FullName, newSong);
+                    }
+                    else
+                    {
+                        // If a song is already playing, stop it
+                        MediaPlayer.Stop();
+                        AssetsManager.Songs[file.FullName] = newSong;
+                    }
+                    
                     break;
                 case AssetType.SpriteFont:
                     SpriteFont? newSpriteFont = AssetReloader.LoadSpriteFont(file.AbsolutePath);
@@ -241,7 +470,15 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    AssetsManager.SpriteFonts[file.FullName] = newSpriteFont;
+
+                    if (create)
+                    {
+                        AssetsManager.SpriteFonts.Add(file.FullName, newSpriteFont);
+                    }
+                    else
+                    {
+                        AssetsManager.SpriteFonts[file.FullName] = newSpriteFont;
+                    }
                     break;
                 case AssetType.Model:
                     Model? newModel = AssetReloader.LoadModel(file.AbsolutePath);
@@ -249,7 +486,15 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    AssetsManager.Models[file.FullName] = newModel;
+
+                    if (create)
+                    {
+                        AssetsManager.Models.Add(file.FullName, newModel);
+                    }
+                    else
+                    {
+                        AssetsManager.Models[file.FullName] = newModel;
+                    }
                     break;
                 case AssetType.Aseprite:
                     AsepriteFile? newAsepriteFile = AssetReloader.LoadAsepriteFile(file.AbsolutePath);
@@ -257,7 +502,15 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    AssetsManager.AsepriteFiles[file.FullName] = newAsepriteFile;
+
+                    if (create)
+                    {
+                        AssetsManager.AsepriteFiles.Add(file.FullName, newAsepriteFile);
+                    }
+                    else
+                    {
+                        AssetsManager.AsepriteFiles[file.FullName] = newAsepriteFile;
+                    }
                     break;
                 case AssetType.Data:
                     string? newData = AssetReloader.LoadDataFile(file.AbsolutePath);
@@ -265,7 +518,15 @@ namespace MonoGameReload.Files
                     {
                         return;
                     }
-                    AssetsManager.DataFiles[file.FullName] = newData;
+
+                    if (create)
+                    {
+                        AssetsManager.DataFiles.Add(file.FullName, newData);
+                    }
+                    else
+                    {
+                        AssetsManager.DataFiles[file.FullName] = newData;
+                    }
                     break;
             }
         }
