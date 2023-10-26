@@ -26,9 +26,8 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Aseprite;
 using MonoGameReload.Assets;
-using System;
-using System.IO;
 
 namespace MonoGameReload.Files
 {
@@ -175,6 +174,9 @@ namespace MonoGameReload.Files
             }
 
             UpdateFile(file);
+
+            // Call the updated event of the file
+            file.OnUpdated(sender, args);
         }
 
         /// <summary>
@@ -198,7 +200,7 @@ namespace MonoGameReload.Files
             switch (file.AssetType)
             {
                 case AssetType.Texture:
-                    Texture2D? newTexture2D = AssetReloader.ReloadTexture2D(file.AbsolutePath);
+                    Texture2D? newTexture2D = AssetReloader.LoadTexture2D(file.AbsolutePath);
                     if (newTexture2D == null || AssetsManager.Textures == null)
                     {
                         return;
@@ -206,7 +208,7 @@ namespace MonoGameReload.Files
                     AssetsManager.Textures[file.FullName] = newTexture2D;
                     break;
                 case AssetType.Effect:
-                    Effect? newEffect = AssetReloader.ReloadEffect(file.AbsolutePath);
+                    Effect? newEffect = AssetReloader.LoadEffect(file.AbsolutePath);
                     if (newEffect == null || AssetsManager.Effects == null)
                     {
                         return;
@@ -214,7 +216,7 @@ namespace MonoGameReload.Files
                     AssetsManager.Effects[file.FullName] = newEffect;
                     break;
                 case AssetType.SoundEffect:
-                    SoundEffect? newSoundEffect = AssetReloader.ReloadSoundEffect(file.AbsolutePath);
+                    SoundEffect? newSoundEffect = AssetReloader.LoadSoundEffect(file.AbsolutePath);
                     if (newSoundEffect == null || AssetsManager.SoundEffects == null)
                     {
                         return;
@@ -224,7 +226,7 @@ namespace MonoGameReload.Files
                     AssetsManager.SoundEffects[file.FullName] = newSoundEffect;
                     break;
                 case AssetType.Song:
-                    Song? newSong = AssetReloader.ReloadSong(file.AbsolutePath);
+                    Song? newSong = AssetReloader.LoadSong(file.AbsolutePath);
                     if (newSong == null || AssetsManager.Songs == null)
                     {
                         return;
@@ -234,7 +236,7 @@ namespace MonoGameReload.Files
                     AssetsManager.Songs[file.FullName] = newSong;
                     break;
                 case AssetType.SpriteFont:
-                    SpriteFont? newSpriteFont = AssetReloader.ReloadSpriteFont(file.AbsolutePath);
+                    SpriteFont? newSpriteFont = AssetReloader.LoadSpriteFont(file.AbsolutePath);
                     if (newSpriteFont == null || AssetsManager.SpriteFonts == null)
                     {
                         return;
@@ -242,12 +244,28 @@ namespace MonoGameReload.Files
                     AssetsManager.SpriteFonts[file.FullName] = newSpriteFont;
                     break;
                 case AssetType.Model:
-                    Model? newModel = AssetReloader.ReloadModel(file.AbsolutePath);
+                    Model? newModel = AssetReloader.LoadModel(file.AbsolutePath);
                     if (newModel == null || AssetsManager.Models == null)
                     {
                         return;
                     }
                     AssetsManager.Models[file.FullName] = newModel;
+                    break;
+                case AssetType.Aseprite:
+                    AsepriteFile? newAsepriteFile = AssetReloader.LoadAsepriteFile(file.AbsolutePath);
+                    if (newAsepriteFile == null || AssetsManager.AsepriteFiles == null)
+                    {
+                        return;
+                    }
+                    AssetsManager.AsepriteFiles[file.FullName] = newAsepriteFile;
+                    break;
+                case AssetType.Data:
+                    string? newData = AssetReloader.LoadDataFile(file.AbsolutePath);
+                    if (newData == null || AssetsManager.DataFiles == null)
+                    {
+                        return;
+                    }
+                    AssetsManager.DataFiles[file.FullName] = newData;
                     break;
             }
         }

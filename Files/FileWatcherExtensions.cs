@@ -132,10 +132,43 @@ namespace MonoGameReload.Files
             ".wmv",
         };
 
+        /// <summary>
+        /// Extension of files that the watcher will ignore
+        /// </summary>
         public static string[] IgnoreExtensions =
         {
             ".mgcb",
             ".xnb"
+        };
+
+        /// <summary>
+        /// Aseprite project files extensions
+        /// </summary>
+        public static string[] AsepriteExtensions =
+        {
+            ".ase",
+            ".aseprite"
+        };
+
+        /// <summary>
+        /// Data files extensions
+        /// </summary>
+        public static string[] DataExtensions =
+        {
+            ".txt", // Txt
+            ".xml", // XML
+            ".json", // JSON
+            ".css", // CSS
+            ".html", // HTML
+            ".js", // JS
+            ".jsx", // JS
+            ".php", // PHP
+            ".cs", // C#
+            ".cpp", // C++
+            ".c", // C
+            ".py", // Python
+            ".lua", // Lua
+            ".rb", // Ruby
         };
 
         /// <summary>
@@ -201,6 +234,26 @@ namespace MonoGameReload.Files
         public static bool IsVideo(string extension)
         {
             return Contains(VideoExtensions, extension);
+        }
+
+        /// <summary>
+        /// Return true if the given extension is an asprite file extension
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        public static bool IsAsepriteProject(string extension)
+        {
+            return Contains(AsepriteExtensions, extension);
+        }
+
+        /// <summary>
+        /// Return true if the given extension is a data file extension
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        public static bool IsData(string extension)
+        {
+            return Contains(DataExtensions, extension);
         }
 
         /// <summary>

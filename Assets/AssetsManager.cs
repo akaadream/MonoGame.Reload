@@ -26,6 +26,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Aseprite;
 using MonoGameReload.Files;
 
 namespace MonoGameReload.Assets
@@ -45,6 +46,8 @@ namespace MonoGameReload.Assets
         FontTexture,
         Material,
         LocalizedFont,
+        Aseprite,
+        Data
     }
 
     public static class AssetsManager
@@ -90,6 +93,16 @@ namespace MonoGameReload.Assets
         public static Dictionary<string, Effect>? Effects { get; private set; }
 
         /// <summary>
+        /// Asprite files collection (.ase, .aseprite)
+        /// </summary>
+        public static Dictionary<string, AsepriteFile>? AsepriteFiles { get; private set; }
+
+        /// <summary>
+        /// Data files collection
+        /// </summary>
+        public static Dictionary<string, string>? DataFiles {  get; private set; }
+
+        /// <summary>
         /// Initialize the asset manager
         /// </summary>
         /// <param name="contentManager"></param>
@@ -104,6 +117,8 @@ namespace MonoGameReload.Assets
             SpriteFonts = new();
             EffectMaterials = new();
             Effects = new();
+            AsepriteFiles = new();
+            DataFiles = new();
         }
 
         /// <summary>
@@ -118,13 +133,15 @@ namespace MonoGameReload.Assets
             SpriteFonts?.Clear();
             EffectMaterials?.Clear();
             Effects?.Clear();
+            AsepriteFiles?.Clear();
+            DataFiles?.Clear();
         }
 
         /// <summary>
         /// Loading an asset
         /// </summary>
         /// <param name="fileName"></param>
-        public static void Load(AssetType type, string fileName)
+        public static void Load(AssetType type, string fileName, string absoluteFilePath = "")
         {
             if (ContentManager == null)
             {
@@ -175,6 +192,44 @@ namespace MonoGameReload.Assets
                     }
                     LoadTo(SpriteFonts, fileName);
                     break;
+                case AssetType.Aseprite:
+                    if (AsepriteFiles == null)
+                    {
+                        return;
+                    }
+
+                    if (!File.Exists(absoluteFilePath))
+                    {
+                        return;
+                    }
+
+                    var asepriteFile = AsepriteFile.Load(absoluteFilePath);
+                    if (asepriteFile == null)
+                    {
+                        return;
+                    }
+
+                    AsepriteFiles.Add(fileName, asepriteFile);
+                    break;
+                case AssetType.Data:
+                    if (DataFiles == null)
+                    {
+                        return;
+                    }
+
+                    if (!File.Exists(absoluteFilePath))
+                    {
+                        return;
+                    }
+
+                    string? data = AssetReloader.LoadDataFile(absoluteFilePath);
+                    if (data == null)
+                    {
+                        return;
+                    }
+
+                    DataFiles.Add(fileName, data);
+                    break;
             }
         }
 
@@ -184,7 +239,7 @@ namespace MonoGameReload.Assets
         /// <param name="file"></param>
         public static void Load(FileProperties file)
         {
-            Load(file.AssetType, file.FullName);
+            Load(file.AssetType, file.FullName, file.AbsolutePath);
         }
 
         /// <summary>
@@ -257,6 +312,16 @@ namespace MonoGameReload.Assets
             if (Models != null && Models.ContainsKey(fileName))
             {
                 return AssetType.Model;
+            }
+
+            if (AsepriteFiles != null && AsepriteFiles.ContainsKey(fileName))
+            {
+                return AssetType.Aseprite;
+            }
+
+            if (DataFiles != null && DataFiles.ContainsKey(fileName))
+            {
+                return AssetType.Data;
             }
 
             return AssetType.NoProcessing;

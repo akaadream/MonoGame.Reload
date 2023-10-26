@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ---------------------------------------------------------------------------- */
 
-using System.IO;
 using MonoGameReload.Assets;
 
 namespace MonoGameReload.Files
@@ -54,6 +53,11 @@ namespace MonoGameReload.Files
         /// </summary>
         public AssetType AssetType { get; set; }
 
+        /// <summary>
+        /// Event called when the file is updated
+        /// </summary>
+        public event EventHandler<FileSystemEventArgs>? Updated;
+
         public FileProperties(string filePath, string root = "")
         {
             AbsolutePath = filePath;
@@ -69,6 +73,11 @@ namespace MonoGameReload.Files
             Name = Path.GetFileNameWithoutExtension(filePath);
 
             AssetType = FindType(Extension);
+        }
+
+        public void OnUpdated(object sender, FileSystemEventArgs args)
+        {
+            Updated?.Invoke(this, args);
         }
 
         /// <summary>
@@ -106,6 +115,18 @@ namespace MonoGameReload.Files
             if (FileWatcherExtensions.EffectExtension == extension)
             {
                 return AssetType.Effect;
+            }
+
+            // Aseprite
+            if (FileWatcherExtensions.IsAsepriteProject(extension))
+            {
+                return AssetType.Aseprite;
+            }
+
+            // Data
+            if (FileWatcherExtensions.IsData(extension))
+            {
+                return AssetType.Data;
             }
 
             return AssetType.NoProcessing;

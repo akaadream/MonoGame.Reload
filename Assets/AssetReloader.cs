@@ -24,16 +24,12 @@ SOFTWARE.
 
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.IO;
-using System.Threading;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using MonoGame.Framework.Content.Pipeline.Builder;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework;
+using MonoGame.Aseprite;
 
 namespace MonoGameReload.Assets
 {
@@ -88,7 +84,7 @@ namespace MonoGameReload.Assets
         /// <param name="graphicsDevice"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static Texture2D? ReloadTexture2D(string filePath)
+        public static Texture2D? LoadTexture2D(string filePath)
         {
             Texture2D? texture = null;
 
@@ -114,7 +110,7 @@ namespace MonoGameReload.Assets
         /// <param name="graphicsDevice"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static Effect? ReloadEffect(string filePath)
+        public static Effect? LoadEffect(string filePath)
         {
             Effect? effect = null;
 
@@ -149,7 +145,7 @@ namespace MonoGameReload.Assets
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static SoundEffect? ReloadSoundEffect(string filePath)
+        public static SoundEffect? LoadSoundEffect(string filePath)
         {
             SoundEffect? soundEffect = null;
 
@@ -175,7 +171,7 @@ namespace MonoGameReload.Assets
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static Song? ReloadSong(string filePath)
+        public static Song? LoadSong(string filePath)
         {
             Song? song = null;
 
@@ -202,7 +198,7 @@ namespace MonoGameReload.Assets
         /// <param name="graphicsDevice"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static Model? ReloadModel(string filePath)
+        public static Model? LoadModel(string filePath)
         {
             Model? model = null;
 
@@ -332,7 +328,7 @@ namespace MonoGameReload.Assets
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static SpriteFont? ReloadSpriteFont(string filePath)
+        public static SpriteFont? LoadSpriteFont(string filePath)
         {
             SpriteFont? spriteFont = null;
 
@@ -372,6 +368,46 @@ namespace MonoGameReload.Assets
             }
 
             return spriteFont;
+        }
+
+        /// <summary>
+        /// Reload a Aseprite file from its source file
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static AsepriteFile? LoadAsepriteFile(string filePath)
+        {
+            AsepriteFile? asepriteFile = null;
+
+            if (File.Exists(filePath))
+            {
+                Thread.Sleep(100);
+                asepriteFile = AsepriteFile.Load(filePath);
+            }
+
+            return asepriteFile;
+        }
+
+        /// <summary>
+        /// Reload a data file from its source file
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string? LoadDataFile(string filePath)
+        {
+            string? dataFile = null;
+
+            if (File.Exists(filePath))
+            {
+                Thread.Sleep(100);
+
+                FileStream fileStream = new(filePath, FileMode.Open);
+
+                using StreamReader reader = new(fileStream);
+                dataFile = reader.ReadToEnd();
+            }
+
+            return dataFile;
         }
     }
 }

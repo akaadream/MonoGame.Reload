@@ -1,4 +1,10 @@
-# MonoGame.Reload
+<h1 align="center">
+    <div style="display:flex; justify-content: center; align-items: center;">
+        <img src="Icon.png" width="32" style="margin-right: 12px" alt="MonoGame.Reload icon" />
+        MonoGame.Reload
+    </div>
+    <img alt="Static Badge" src="https://img.shields.io/badge/NuGeT-0.2.0?link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FMonoGame.Reload%2F0.2.0">
+</h1>
 
 MonoGame.Reload is an hot-reloader for your MonoGame application.  
 No more thousands of restarts of your game to try out a new version of your assets.  
@@ -6,22 +12,32 @@ Set up the hot-reloader in a flash and simply enjoy the magic.
 
 ## Installation
 
-MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.1.0).  
+MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.2.0).  
 
 #### .NET CLI
 ```
-dotnet add package MonoGame.Reload --version 0.1.0
+dotnet add package MonoGame.Reload --version 0.2.0
 ```
 
 #### Package Manager
 ```
-NuGet\Install-Package MonoGame.Reload -Version 0.1.0
+NuGet\Install-Package MonoGame.Reload -Version 0.2.0
 ```
 
 #### PackageReference
 ```
-<PackageReference Include="MonoGame.Reload" Version="0.1.0" />
+<PackageReference Include="MonoGame.Reload" Version="0.2.0" />
 ```
+
+## 0.2.0 updates
+
+Since `MonoGame.Reload v0.2.0`, the library can reload Aseprite files using [MonoGame.Aseprite](https://monogameaseprite.net/) written by Aristurtle.  Check it out for more informations!
+
+New assets are now supported :
+- Aseprite files
+- Data files (.txt, .json, .xml, ...)
+  
+You can now attach a callback to a file by listening the `Updated` event. The callback will be invoked right after the file has been reloaded.
 
 ## Getting started
 
@@ -79,13 +95,38 @@ AssetsManager.Textures["Sprites/name_of_my_texture"];
 
 > *2nd Note*: If the key of the texture does not exists, an exception will be thrown, so you may want to check if the texture name exists by using `Textures2D.ContainsKey(string key)`.
 
+## Listen a file update
+You can attach a callback to a file for it to be invoked when the file is updated:
+```csharp
+protected override void LoadContent()
+{
+    // ...
+
+    // Make sure you already load your files
+    _watcher.LoadFiles();
+
+    var file = _watcher.FilesTree.Find("name_of_my_asset");
+    if (file != null)
+    {
+        file.Updated += OnMyAssetUpdate;
+    }
+}
+
+private void OnMyAssetUpdate(object sender, FileSystemEventArgs args)
+{
+    // Do something
+}
+```
+
 ## Roadmap
 
 This library is currently limited to the default assets the Content Pipeline is managing. (and even some types of files are missing)  
-It's why I want to improve MonoGame.Reload to make it have more files reloaded!
-- [ ] Json files reload
-- [ ] XML files reload
-- [ ] Aseprite file reload (using [MonoGame.Aseprite](https://monogameaseprite.net/))
+It's why I want to improve MonoGame.Reload to make it have more files reloaded!  
+Do not hesitate to ask for new features!
+
+## Credits
+- MonoGame (under Ms-PL licence): https://github.com/MonoGame/MonoGame 
+- MonoGame.Aseprite (under MIT licence): https://github.com/AristurtleDev/monogame-aseprite
 
 ## Licence
 
