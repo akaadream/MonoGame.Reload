@@ -1,10 +1,14 @@
 <h1 align="center">
-    <div style="display:flex; justify-content: center; align-items: center;">
-        <img src="Icon.png" width="32" style="margin-right: 12px" alt="MonoGame.Reload icon" />
+    <div>
+        <img src="Icon.png" width="84" alt="MonoGame.Reload icon" />
+        <br />
         MonoGame.Reload
     </div>
-    <img alt="Static Badge" src="https://img.shields.io/badge/NuGeT-0.2.0?link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FMonoGame.Reload%2F0.2.0">
 </h1>
+
+[![Nuget 0.2.0](https://badgen.net/nuget/v/MonoGame.Reload)](https://www.nuget.org/packages/MonoGame.Reload/0.2.0)
+[![MIT licence](https://badgen.net/static/license/MIT/blue)](https://github.com/akaadream/MonoGame.Reload/blob/main/LICENCE)
+
 
 MonoGame.Reload is an hot-reloader for your MonoGame application.  
 No more thousands of restarts of your game to try out a new version of your assets.  
