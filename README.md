@@ -43,6 +43,11 @@ New assets are now supported :
   
 You can now attach a callback to a file by listening the `Updated` event. The callback will be invoked right after the file has been reloaded.
 
+## Disclaimer
+
+Things you have to know is the library watch updates of your content directory files. But when you are using Visual Studio to update a specific file (for example, double-clicking on an Effect file will open it inside Visual Studio), and when you are modiying then saving the file, Visual Studio create a temporary file which creating issues with the library.  
+I don't know if I can improve the library to avoid this behavior, even using Visual Studio, but at this time, you should avoid it and use Visual Studio Code for example which is the code editor I tested during the library development
+
 ## Getting started
 
 On your Game class add an instance of `FileWatcher`:
