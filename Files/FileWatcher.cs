@@ -1,7 +1,7 @@
 ﻿/* ----------------------------------------------------------------------------
 MIT License
 
-Copyright (c) 2023 Guillaume Lortet
+Copyright (c) 2024 Guillaume Lortet
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ---------------------------------------------------------------------------- */
 
+using AsepriteDotNet.Aseprite;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-using MonoGame.Aseprite;
 using MonoGameReload.Assets;
-using SharpFont.PostScript;
 
 namespace MonoGameReload.Files
 {
@@ -97,6 +96,9 @@ namespace MonoGameReload.Files
 
             // Configure the file system watcher
             ConfigureHotReloading();
+
+            // Load the files
+            LoadFiles();
         }
 
         public void Initialize()

@@ -6,7 +6,7 @@
     </div>
 </h1>
 
-[![Nuget 0.2.0](https://badgen.net/nuget/v/MonoGame.Reload)](https://www.nuget.org/packages/MonoGame.Reload/0.2.0)
+[![Nuget 0.3.0](https://badgen.net/nuget/v/MonoGame.Reload)](https://www.nuget.org/packages/MonoGame.Reload/0.3.0)
 [![MIT licence](https://badgen.net/static/license/MIT/blue)](https://github.com/akaadream/MonoGame.Reload/blob/main/LICENCE)
 
 
@@ -16,22 +16,27 @@ Set up the hot-reloader in a flash and simply enjoy the magic.
 
 ## Installation
 
-MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.2.0).  
+MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.3.0).  
 
 #### .NET CLI
 ```
-dotnet add package MonoGame.Reload --version 0.2.0
+dotnet add package MonoGame.Reload --version 0.3.0
 ```
 
 #### Package Manager
 ```
-NuGet\Install-Package MonoGame.Reload -Version 0.2.0
+NuGet\Install-Package MonoGame.Reload -Version 0.3.0
 ```
 
 #### PackageReference
 ```
-<PackageReference Include="MonoGame.Reload" Version="0.2.0" />
+<PackageReference Include="MonoGame.Reload" Version="0.3.0" />
 ```
+
+## 0.3.0 updates
+
+* The way to initialize the library has been reworked and simplified.
+* You now have helper to quickly render textures, models, aseprite files or play sounds and songs
 
 ## 0.2.0 updates
 
@@ -45,57 +50,41 @@ You can now attach a callback to a file by listening the `Updated` event. The ca
 
 ## Disclaimer
 
-Things you have to know is the library watch updates of your content directory files. But when you are using Visual Studio to update a specific file (for example, double-clicking on an Effect file will open it inside Visual Studio), and when you are modiying then saving the file, Visual Studio create a temporary file which creating issues with the library.  
+> Things you have to know is the library watch updates of your content directory files. But when you are using Visual Studio to update a specific file (for example, double-clicking on an Effect file will open it inside Visual Studio), and when you are modiying then saving the file, Visual Studio create a temporary file which creating issues with the library.  
 I don't know if I can improve the library to avoid this behavior, even using Visual Studio, but at this time, you should avoid it and use Visual Studio Code for example which is the code editor I tested during the library development
 
 ## Getting started
 
-On your Game class add an instance of `FileWatcher`:
-```csharp
-private FileWatcher _watcher;
-```
-Then, **instanciate** it inside your `Initialize` function:
+Firstly, **initialize** the reloader inside the `Initialize` function:
 ```csharp
 protected override void Initialize()
 {
-    _watcher = new(Content);
+    Reloader.Initialize(Content, GraphicsDevice, Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform.DesktopGL);
 
     base.Initialize();
 }
 ```
-> *Note*: The watcher is instanciated with the ContentManager because it will be used to create all the assets collections.
+Congratulations! The Hot-Reloader is now setup!  
 
-Now, you'll need to initialize the `AssetReloader`, the class used to hot-reload your content files:
+## Ignore files
+
+In some cases, you don't need to watch some files extensions. You can do so by using a simple function:
 ```csharp
 protected override void Initialize()
 {
-    _watcher = new(Content);
-
-    AssetReloader.Initialize(
-        _watcher.ProjectRootPath,
-        Microsoft.Xna.Framework.Content.Pipeline.TargetPlatform.DesktopGL,
-        GraphicsDevice
-        );
+    // Right after the Reloader.Initialize(...)
+    Reloader.Ignore(AssetType.Model, AssetType.Song);
 }
 ```
+You can put on the `Ignore` function as many AssetType as you want and all these types will be ignored if they are listened by the Reloader.  
 
-Finally, you have to load the current Content files inside your `LoadContent` function:
+## Access a single file
 
-```csharp
-protected override void LoadContent()
-{
-    _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-    _watcher.LoadFiles();
-}
-```
-
-Congratulations!  
-The Hot-Reloader is now setup and you can easily access to an asset which will be automatically reloaded when you will update its source file:
+Sometimes, you'll need to retrieve a single asset. Depending on the type of the asset, you will have access to it inside the `AssetsManager` class.
 
 ```csharp
 // Access to a Texture2D
-AssetsManager.Textures["Sprites/name_of_my_texture"];
+AssetsManager.Textures["path/name_of_my_texture"];
 ```
 
 > *Note*: You have to respect the hierarchy of your files.  
@@ -112,26 +101,39 @@ protected override void LoadContent()
     // ...
 
     // Make sure you already load your files
-    _watcher.LoadFiles();
-
-    var file = _watcher.FilesTree.Find("name_of_my_asset");
-    if (file != null)
-    {
-        file.Updated += OnMyAssetUpdate;
-    }
-}
-
-private void OnMyAssetUpdate(object sender, FileSystemEventArgs args)
-{
-    // Do something
+    Reloader.OnUpdate("path/asset_name", (object sender, FileSystemEventArgs args) => {
+        Console.WriteLine("The path/asset_name file has been updated");
+    });
 }
 ```
 
+## Assets usage
+
+If you want draw a texture or an Aseprite sprite, you can use a shortcut of the library which will render the asset if the asset is available:
+```csharp
+AssetsManager.Render2D("path/asset_name", position, source, spriteBatch, graphicsDevice, rotation, scale);
+```
+You can do the same with a Model:
+```csharp
+AssetsManager.Render3D("path/asset_name", world, view, projection);
+```
+And with a sound or a song:
+```csharp
+AssetsManager.Play("path/asset_name", volume);
+```
+
+> Note that these function are basic and do not use all the features you should want to use.
+> In that case, you can access the asset via the dictionaries as I mentioned them in the `Access a single file` section.
+
 ## Roadmap
 
-This library is currently limited to the default assets the Content Pipeline is managing. (and even some types of files are missing)  
-It's why I want to improve MonoGame.Reload to make it have more files reloaded!  
-Do not hesitate to ask for new features!
+I'm always looking to improve this library.  
+If you need a feature which is not covered, please send me a message!
+
+## Contribute
+
+All the contribution are welcome.  
+If you want to help me improve the library, please send me a message!
 
 ## Credits
 - MonoGame (under Ms-PL licence): https://github.com/MonoGame/MonoGame 

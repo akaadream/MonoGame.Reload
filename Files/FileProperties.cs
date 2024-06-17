@@ -1,7 +1,7 @@
 ﻿/* ----------------------------------------------------------------------------
 MIT License
 
-Copyright (c) 2023 Guillaume Lortet
+Copyright (c) 2024 Guillaume Lortet
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,11 +85,11 @@ namespace MonoGameReload.Files
             }
             FullName = FullName.Replace(@"\", "/");
             FullName = FullName.Replace(@"\\", "/");
-            FullName = FullName.Substring(1, FullName.Length - 1);
-            if (FullName.Contains("."))
+            FullName = FullName[1..];
+            if (FullName.Contains('.'))
             {
                 int lastDotIndex = FullName.LastIndexOf('.');
-                FullName = FullName.Substring(0, lastDotIndex);
+                FullName = FullName[..lastDotIndex];
             }
 
             Extension = Path.GetExtension(newFilePath);

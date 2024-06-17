@@ -1,7 +1,7 @@
 ﻿/* ----------------------------------------------------------------------------
 MIT License
 
-Copyright (c) 2023 Guillaume Lortet
+Copyright (c) 2024 Guillaume Lortet
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ---------------------------------------------------------------------------- */
 
+using AsepriteDotNet.Aseprite;
+using AsepriteDotNet.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -110,15 +113,15 @@ namespace MonoGameReload.Assets
         {
             ContentManager = contentManager;
 
-            Textures = new();
-            Songs = new();
-            SoundEffects = new();
-            Models = new();
-            SpriteFonts = new();
-            EffectMaterials = new();
-            Effects = new();
-            AsepriteFiles = new();
-            DataFiles = new();
+            Textures = [];
+            Songs = [];
+            SoundEffects = [];
+            Models = [];
+            SpriteFonts = [];
+            EffectMaterials = [];
+            Effects = [];
+            AsepriteFiles = [];
+            DataFiles = [];
         }
 
         /// <summary>
@@ -203,7 +206,7 @@ namespace MonoGameReload.Assets
                         return;
                     }
 
-                    var asepriteFile = AsepriteFile.Load(absoluteFilePath);
+                    var asepriteFile = AsepriteFileLoader.FromFile(absoluteFilePath);
                     if (asepriteFile == null)
                     {
                         return;
@@ -325,6 +328,70 @@ namespace MonoGameReload.Assets
             }
 
             return AssetType.NoProcessing;
+        }
+
+        /// <summary>
+        /// Find a texture by its key name and render it at the given postion using the given sprite batch.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="position"></param>
+        /// <param name="rectangle"></param>
+        /// <param name="spriteBatch"></param>
+        /// <returns>True if a texture has been drawn on the screen</returns>
+        public static bool Render2D(string key, Vector2 position, Rectangle? rectangle, SpriteBatch spriteBatch, GraphicsDevice? graphicsDevice = null, float rotation = 0f, float scale = 1f)
+        {
+            if (Textures != null && Textures.TryGetValue(key, out var texture))
+            {
+                spriteBatch.Draw(texture, position, rectangle, Color.White, rotation, new Vector2(texture.Width / 2, texture.Height / 2), scale, SpriteEffects.None, 1f);
+                return true;
+            }
+            if (graphicsDevice != null && AsepriteFiles != null && AsepriteFiles.TryGetValue(key, out var asepriteFile))
+            {
+                Sprite sprite = asepriteFile.CreateSprite(graphicsDevice, 0);
+                sprite.Scale = new Vector2(scale);
+                sprite.Rotation = rotation;
+                sprite.Origin = new Vector2(sprite.Width / 2, sprite.Height / 2);
+                sprite.Draw(spriteBatch, position);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Find a model by its key name and render it using the given matrixes
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="world"></param>
+        /// <param name="view"></param>
+        /// <param name="projection"></param>
+        /// <returns>True if a model has been drawn on the screen</returns>
+        public static bool Render3D(string key, Matrix world, Matrix view, Matrix projection)
+        {
+            if (Models != null && Models.TryGetValue(key, out var model))
+            {
+                model.Draw(world, view, projection);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Find a sound or a song by its key name and play it with the specified volume
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="volume"></param>
+        /// <returns>True if a sound or song has been played</returns>
+        public static bool Play(string key, float volume = 1f)
+        {
+            if (SoundEffects != null && SoundEffects.TryGetValue(key, out var effect))
+            {
+                return effect.Play(1f, 0f, 0f);
+            }
+            if (Songs != null && Songs.TryGetValue(key, out var song))
+            {
+                MediaPlayer.Play(song);
+                MediaPlayer.Volume = volume;
+            }
+            return false;
         }
     }
 }

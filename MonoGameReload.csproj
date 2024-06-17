@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -13,7 +13,7 @@
     <PackageIcon>Icon.png</PackageIcon>
     <Description>Hot-reloading for MonoGame</Description>
     <Authors>Guillaume Lortet</Authors>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <RepositoryUrl>https://github.com/akaadream/MonoGame.Reload</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Aseprite" Version="5.1.1" />
+    <PackageReference Include="MonoGame.Aseprite" Version="6.0.5" />
     <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
   </ItemGroup>

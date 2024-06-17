@@ -1,7 +1,7 @@
 ﻿/* ----------------------------------------------------------------------------
 MIT License
 
-Copyright (c) 2023 Guillaume Lortet
+Copyright (c) 2024 Guillaume Lortet
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,8 @@ using MonoGame.Framework.Content.Pipeline.Builder;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework;
-using MonoGame.Aseprite;
+using AsepriteDotNet.Aseprite;
+using AsepriteDotNet.IO;
 
 namespace MonoGameReload.Assets
 {
@@ -69,8 +70,10 @@ namespace MonoGameReload.Assets
             FontDescriptionProcessor = new();
             FontDescriptionImporter = new();
 
-            PipelineManager pipelineManager = new(projectPath, "bin", "obj");
-            pipelineManager.Platform = targetPlatform;
+            PipelineManager pipelineManager = new(projectPath, "bin", "obj")
+            {
+                Platform = targetPlatform
+            };
 
             PipelineImporterContext = new(pipelineManager);
             PipelineProcessorContext = new(pipelineManager, new());
@@ -306,9 +309,11 @@ namespace MonoGameReload.Assets
                         }
                     }
 
-                    model = new(GraphicsDevice, modelBones, modelMeshes);
-                    model.Root = modelBones[modelContent.Root.Index];
-                    model.Tag = modelContent.Tag;
+                    model = new(GraphicsDevice, modelBones, modelMeshes)
+                    {
+                        Root = modelBones[modelContent.Root.Index],
+                        Tag = modelContent.Tag
+                    };
 
                     var methods = model.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                     var buildHierarchy = methods.Where(x => x.Name == "BuildHierarchy" && x.GetParameters().Length == 0).First();
@@ -382,7 +387,7 @@ namespace MonoGameReload.Assets
             if (File.Exists(filePath))
             {
                 Thread.Sleep(100);
-                asepriteFile = AsepriteFile.Load(filePath);
+                asepriteFile = AsepriteFileLoader.FromFile(filePath);
             }
 
             return asepriteFile;
