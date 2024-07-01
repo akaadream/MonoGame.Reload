@@ -410,6 +410,7 @@ namespace MonoGameReload.Files
                     }
                     else
                     {
+                        AssetsManager.Textures[file.FullName].Dispose();
                         AssetsManager.Textures[file.FullName] = newTexture2D;
                     }
                     break;
@@ -426,6 +427,7 @@ namespace MonoGameReload.Files
                     }
                     else
                     {
+                        AssetsManager.Effects[file.FullName].Dispose();
                         AssetsManager.Effects[file.FullName] = newEffect;
                     }
                     break;
@@ -462,6 +464,7 @@ namespace MonoGameReload.Files
                     {
                         // If a song is already playing, stop it
                         MediaPlayer.Stop();
+                        AssetsManager.Songs[file.FullName].Dispose();
                         AssetsManager.Songs[file.FullName] = newSong;
                     }
                     
@@ -479,6 +482,7 @@ namespace MonoGameReload.Files
                     }
                     else
                     {
+                        AssetsManager.SpriteFonts[file.FullName].Texture.Dispose();
                         AssetsManager.SpriteFonts[file.FullName] = newSpriteFont;
                     }
                     break;
