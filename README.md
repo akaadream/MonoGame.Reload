@@ -6,7 +6,7 @@
     </div>
 </h1>
 
-[![Nuget 0.3.1](https://badgen.net/nuget/v/MonoGame.Reload/latest)](https://www.nuget.org/packages/MonoGame.Reload/0.3.1)
+[![Nuget 0.3.1](https://badgen.net/nuget/v/MonoGame.Reload/latest)](https://www.nuget.org/packages/MonoGame.Reload/0.3.2)
 [![MIT licence](https://badgen.net/static/license/MIT/blue)](https://github.com/akaadream/MonoGame.Reload/blob/main/LICENCE)
 
 
@@ -16,21 +16,21 @@ Set up the hot-reloader in a flash and simply enjoy the magic.
 
 ## Installation
 
-MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.3.1).  
+MonoGame.Reload is available as a NuGeT package [here](https://www.nuget.org/packages/MonoGame.Reload/0.3.2).  
 
 #### .NET CLI
 ```
-dotnet add package MonoGame.Reload --version 0.3.1
+dotnet add package MonoGame.Reload --version 0.3.2
 ```
 
 #### Package Manager
 ```
-NuGet\Install-Package MonoGame.Reload -Version 0.3.1
+NuGet\Install-Package MonoGame.Reload -Version 0.3.2
 ```
 
 #### PackageReference
 ```
-<PackageReference Include="MonoGame.Reload" Version="0.3.1" />
+<PackageReference Include="MonoGame.Reload" Version="0.3.2" />
 ```
 
 ## 0.3.1 updates
