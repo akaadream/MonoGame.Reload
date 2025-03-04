@@ -45,7 +45,7 @@ namespace MonoGameReload
         /// <param name="target"></param>
         public static void Initialize(ContentManager content, GraphicsDevice graphicsDevice, TargetPlatform target)
         {
-            FileWatcher = new(content);
+            FileWatcher = new(content, content.RootDirectory);
             AssetReloader.Initialize(FileWatcher.RootPath, target, graphicsDevice);
         }
 
